@@ -1,11 +1,49 @@
+html{
+  
+}
 body {
   height: 100vh;
   width: 100vw;
   max-width: 100%;
   max-height:100%;
   background-color: #282c34;
+
+  /* hide scrollbar for IE, Edge and Firefox */
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+/* hide scrollbar for Chrome, Safari and Opera */
+body::-webkit-scrollbar {
+  display: none;
+}
+#root{
+  padding: 4vh 10vw 0 10vw;
+}
+/* jumps to the top bottom and its arrow */
+#jumpTopBtn{
+  width:10vmin;
+  height:10vmin;
+  margin:0;
+  padding:0;
+  position: fixed;
+  right: 2vmin;
+  bottom: 2vmin;
+
+  border:none;
+  background-color: transparent;
+  color: none;
+}
+#jumpTopBtn > svg{
+  height: 10vmin;
+  width: 10vmin;
+  border-radius: 50%;
+  background-color: gray;
+}
+#jumpTopBtn > svg:hover{
+  background-color: darkgray;
 }
 
+/* the title of the page */
 header {
   height: 20vh;
   width: 100%;
@@ -31,9 +69,7 @@ header {
   user-select: none
 }
 
-#root{
-  padding: 4vh 10vw 0 10vw;
-}
+/* tabs' heads */
 #tabLst{
   display: flex;
   align-items: center;
@@ -62,6 +98,7 @@ header {
   border-bottom: 1px solid gray;
 }
 
+/* tabs' bodies */
 .tabBody{
   width:100%;
   color: white;
@@ -79,11 +116,13 @@ header {
   display: none;
 }
 
+/* phase1 cards */
 .card{
   margin: 10px 0 10px 0;
   padding: 5px;
-  height: 140px;
   width: 345px;
+  height:auto;
+  max-height:140px;
 
   border-radius: 15px 25px;
   border: 1px solid rgb(40,44,52); 
@@ -102,12 +141,43 @@ header {
   position: absolute;
   
   padding:0px;
-  border-radius: 50%;
   transition: 0.3s;
 }
 .cardIcon:hover {
   opacity: 0.5;
 }
+
+.cardTitle{
+  padding:10px 10px 8px 25px;
+  width: 72%;
+  max-width: 75%;
+  transition: 0.3s;
+  height:auto;
+  margin:0;
+}
+.cardTitle > a {
+  font-family: 'georgia';
+  font-size: 0.9em;
+  font-weight: 400;
+  margin: 0;
+  letter-spacing: .05em;
+  color: #D6D5D6 ;
+  text-decoration: none;
+
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.cardTitle > a:hover{
+  text-decoration: underline;
+}
+.cardTitle > a > p{
+  margin:0;
+  padding:0;
+}
+
+/* contains both the date and the image */
 .cardRight{
   width:40%;
   max-width: 40%;
@@ -128,27 +198,6 @@ header {
   margin-top:28px;
   max-width: 90%;
   height: auto;
-}
-.cardTitle{
-  padding:20px 10px 18px 20px;
-  width: 72%;
-  max-width: 75%;
-  transition: 0.3s;
-
-  display: -webkit-box;
-  -webkit-line-clamp: 5;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-.cardTitle > a {
-  font-family: 'georgia';
-  font-size: 0.9em;
-  font-weight: 400;
-  margin-bottom: 5px;
-  letter-spacing: .05em;
-  color: #D6D5D6 ;
-  text-decoration: none;
-}
-.cardTitle > a:hover{
-  text-decoration: underline;
+  max-height: 100px;
+  border-radius: 5%;
 }
