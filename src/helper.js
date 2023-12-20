@@ -20,6 +20,8 @@ const _ = (()=>{
 
 //takes epoch and returns the date string based on the entry type
 function formatDateFromEpoch(epoch, entryType) {
+    if (epoch === 0)
+        return ''
     const months = [
       'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
       'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'

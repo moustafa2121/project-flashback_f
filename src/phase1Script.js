@@ -5,37 +5,79 @@ import { formatDateFromEpoch } from "./helper";
 import React, { useState, useEffect } from "react";
 import { throttle } from 'lodash';
 
-//given an entry type (i.e. RE for reddit), it returns specific
-//format to display data for each entry (e.g. icon, color, others)
-function getCardDesign(entryType, epoch, img) {
-    const base = { gridTemplate: img ? "0% 70% auto":"0% auto auto",
-                date:formatDateFromEpoch(epoch, entryType)}
-    //todo: remove the bg values, we are not using them
-    if (entryType === "RE")
-      return {...base, icon:"3.png", bg:'repeating-linear-gradient(-30deg, rgba(255, 165, 0, 0.1), rgba(255, 165, 0, 0.1) 3px, rgba(40,44,52,0.5) 2px, rgba(40,44,52,0.5) 10px)', link:"https://www.reddit.com/",}
-    else if(entryType === "NW")
-      return {...base, icon:"1.png", bg:'repeating-linear-gradient(-30deg, rgba(29, 161, 242, 0.2), rgba(29, 161, 242, 0.2) 3px, rgba(40,44,52,0.5) 2px, rgba(40,44,52,0.5) 10px)', link:"https://twitter.com/",}
-    else if (entryType === "ME")
-      return {...base, icon:"2.png", bg:'repeating-linear-gradient(-30deg, rgba(100, 100, 100, 0.2), rgba(100, 100, 100, 0.2) 3px, rgba(40,44,52,0.5) 2px, rgba(40,44,52,0.5) 10px)', link:"https://knowyourmeme.com/", borderRadius:"50%"}
+//returns the icon of each card depending on the entry type
+function CardIcon({entryType}){
+    //since the icon within the card (and the card is clickable)
+    //this prevents the from propgating the click to the parent
+    //when the icon is clicked, thus we got to the icon's link
+    const handleButtonClick = event => event.stopPropagation();
+    let link, img;
+    if (entryType === "RE"){
+        link = "https://www.reddit.com/";
+        img = <img className="cardIcon" src="3.png" alt="Avatar"></img>
+    }
+    else if(entryType === "NW"){
+        link = "https://twitter.com/";
+        img = <img className="cardIcon" src="1.png" alt="Avatar"></img>
+    }
+    else if (entryType === "ME"){
+        link = "https://knowyourmeme.com/";
+        img = <img className="cardIcon" src="2.png" alt="Avatar" style={{borderRadius:"50%"}}></img>
+    }
+    else if (entryType === "WK"){
+        link = "https://www.wikipedia.org/"
+        img = <img className="cardIcon" src="4.png" alt="Avatar"></img>
+    }
+    else if (entryType === "GA"){
+        link = "https://www.imdb.com/"
+        img = <img className="cardIcon" src="7.png" alt="Avatar"></img>
+    }
+    else if (entryType === "MV"){
+        link = "https://www.imdb.com/"
+        img = <img className="cardIcon" src="5.png" alt="Avatar"></img>
+    }
+    else if (entryType === "TV"){
+        link = "https://www.imdb.com/"
+        img = <img className="cardIcon" src="6.png" alt="Avatar"></img>
+    }
+    return(
+        <a href={link} target="_blank" onClick={handleButtonClick}>
+            {img}
+        </a>
+    )
 }
-
+function CardTitle({date, url, title, summary, entryType}){
+    const dateC = formatDateFromEpoch(date, entryType);
+    console.log(entryType);
+    let titleClassName = '';
+    if (entryType === "WK" || entryType === "TV" || entryType === "MV")
+        titleClassName = "cardTitle1";
+    else if (entryType === "GA")
+        titleClassName = "cardTitle2";
+    const additional = summary === undefined ? '' : ": "+ summary;
+    return(
+        <div className="cardLeft">
+            <div className="cardDate">{dateC}</div>
+            <div className={`cardTitle ${titleClassName}`}>
+                <p>{title}{additional}</p>
+            </div>
+        </div>
+    )
+}
 //the component for the card (i.e. the card-like that displays each entry)
 function Card(props){
     //fetch data based on the entry type of the card
-    const cardDesign = getCardDesign(props.entryType, props.date, props.img)
+    const gridTemplate = props.img ? "0% 75% 25%":"0% auto auto";
     return(
-    <article className="card" style={{ background: "#222224", gridTemplateColumns: `${cardDesign.gridTemplate}`}}>
-        <a href={cardDesign.link} target="_blank">
-            <img className="cardIcon" src={cardDesign.icon} alt="Avatar" style={{borderRadius:`${cardDesign.borderRadius}`}}></img>
-        </a>
-        <div className="cardLeft">
-            <div className="cardDate">{cardDesign.date}</div>
-            <div className="cardTitle">
-                <a target="_blank" href={props.url}><p>{props.title}</p></a>
+        <article className="card" style={{gridTemplateColumns: gridTemplate}} onClick={() => window.open(props.url, '_blank')}>
+            <CardIcon {...props}/>
+            <CardTitle {...props}/>
+            {props.img ? 
+            <div className="cardContainer">
+                <img className="cardImg" src={props.img} alt="Card Image"/> 
             </div>
-        </div>
-        {props.img ? <img className="cardImg" src={props.img} alt="Card Image"/> : ''}
-    </article>
+            : ''}
+        </article>
     )
 }
 
