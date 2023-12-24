@@ -1,0 +1,97 @@
+
+/* phase1 cards */
+
+/* spotifycard */
+.spotifyCard {
+    max-height: 80px;
+    padding:0;
+    margin:10px 0 10px 0;
+  }
+  .spotifyCard iframe {
+  }
+  
+  /* general card */
+  .card{
+    margin: 10px 0 10px 0;
+    padding: 5px;
+    height:auto;
+    width: 345px;
+    max-width: 80vw;
+    max-height:140px;
+  
+    border-radius: 15px 25px;
+    border: 1px solid gray; 
+    background-color: #222224;
+    display: inline-grid;
+  }
+  .card:hover{
+    border: 1px solid whitesmoke; 
+    cursor: pointer;
+  }
+  
+  .cardIcon {
+    max-width: 12%;
+    height: auto;
+  
+    top:-16px;
+    left:-16px;
+    position: absolute;
+    
+    padding:0px;
+    transition: 0.2s;
+    z-index: 2;
+  }
+  .cardIcon:hover {
+    scale:1.3;
+  }
+  
+  .cardDate{
+    position: absolute;
+    left: 30px;
+    top:5px;
+    cursor: default;
+    
+    font-family: 'georgia';
+    font-size: 0.7em;
+    font-weight: 600;
+    letter-spacing: .08em;
+    color: #D6D5D6;
+  }
+  
+  .cardTitle{
+    padding:26px 10px 8px 25px;
+    width: 100%;
+    max-width: 100%;
+    transition: 0.3s;
+    height:auto;
+    margin:0;
+  }
+  .cardTitle1{/* no date, push the title up a bit */
+    padding:5px 10px 8px 25px !important;
+  }
+  .cardTitle2{/* no date, push the title up a bit */
+    padding:10px 10px 8px 25px !important;
+  }
+  .cardTitle p {
+    font-family: 'georgia';
+    font-size: 0.9em;
+    font-weight: 400;
+    margin: 0;
+    letter-spacing: .05em;
+    color: #D6D5D6 ;
+    text-decoration: none;
+  
+    display: -webkit-box;
+    -webkit-line-clamp: 4;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  
+  .cardImg{
+    margin:10px 5px 5px 0px;
+    max-width: 95%;
+    height: auto;
+    max-height: 100px;
+    border-radius: 3%;
+    float:right;
+  }

@@ -1,9 +1,11 @@
 //handles phase1 
 //exports the tab body component of phase1
+import './styles/style_card.css';
 
 import { formatDateFromEpoch } from "./helper";
 import React, { useState, useEffect } from "react";
 import { throttle } from 'lodash';
+import Phase1Form from './phase1Input';
 
 //returns the icon of each card depending on the entry type
 function CardIcon({entryType}){
@@ -40,8 +42,12 @@ function CardIcon({entryType}){
         link = "https://www.imdb.com/"
         img = <img className="cardIcon" src="6.png" alt="Avatar"></img>
     }
+    // else if (entryType === "SO"){
+    //     link = "https://open.spotify.com/"
+    //     img = <img className="cardIcon" src="8.png" alt="Avatar"></img>
+    // }
     return(
-        <a href={link} target="_blank" onClick={handleButtonClick}>
+        <a href={link} target="_blank" onClick={handleButtonClick} rel="noopener noreferrer">
             {img}
         </a>
     )
@@ -64,21 +70,37 @@ function CardTitle({date, url, title, summary, entryType}){
         </div>
     )
 }
+//specialized card for embeded spotify link
+function CardSpotify({url}){
+    const match = url.match(/https:\/\/open\.spotify\.com\/track\/([a-zA-Z0-9]+)/)[1];
+    const embedLink = `https://open.spotify.com/embed/track/${match}`;
+    return(
+        <article className="spotifyCard">
+            <iframe  src={embedLink} title="spotifyTitle"
+            frameBorder="0" allowtransparency="true" 
+            allow="encrypted-media"></iframe>
+        </article>
+    )
+}
 //the component for the card (i.e. the card-like that displays each entry)
 function Card(props){
     //fetch data based on the entry type of the card
-    const gridTemplate = props.img ? "0% 75% 25%":"0% auto auto";
-    return(
-        <article className="card" style={{gridTemplateColumns: gridTemplate}} onClick={() => window.open(props.url, '_blank')}>
-            <CardIcon {...props}/>
-            <CardTitle {...props}/>
-            {props.img ? 
-            <div className="cardContainer">
-                <img className="cardImg" src={props.img} alt="Card Image"/> 
-            </div>
-            : ''}
-        </article>
-    )
+    const gridTemplate = props.img ? "0% 75% 25%":"0% auto";
+    if (props.entryType === "SO")
+        return (<CardSpotify {...props}/>)
+    else{
+        return(
+            <article className="card" style={{gridTemplateColumns: gridTemplate}} onClick={() => window.open(props.url, '_blank')}>
+                <CardIcon {...props}/>
+                <CardTitle {...props}/>
+                {props.img ? 
+                <div className="cardContainer">
+                    <img className="cardImg" src={props.img} alt="Card"/> 
+                </div>
+                : ''}
+            </article>
+        )
+    }
 }
 
 //the component of phase1
@@ -91,6 +113,8 @@ function TabBodyPhase1(){
     const [batch, setbatch] = useState(1);
     //throttles the scrolling, await fetching more data
     const [loading, setLoading] = useState(false);
+    //set the year of the data to be retrieved
+    const [year, setYear] = useState(2000);
     
     //async fetch data from the api.
     //called on page load and everytime the user
@@ -151,9 +175,14 @@ function TabBodyPhase1(){
     //if the data are not loaded/being loaded
     if (data.length === 0)
       return <div>Loading...</div>; //todo: loading icon
-  
+    
     return (
-      <>{data.map(entry => <Card {...entry} key={entry.entryId}/>)}</>
+      <>
+        <Phase1Form year={year} setTheYear={setYear}/>
+        <h4>What the internet looked like in the year ... {year}</h4>
+        <hr/>
+        {data.map(entry => <Card {...entry} key={entry.entryId}/>)}
+      </>
     )
   }
 

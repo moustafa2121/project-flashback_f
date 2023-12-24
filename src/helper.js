@@ -1,7 +1,7 @@
 //helper functions script
 
 //handles the jump to top button
-const _ = (()=>{
+(()=>{
     const topButton = document.getElementById("jumpTopBtn");
     topButton.style.display = "none";
     const scrollPoint = 200;

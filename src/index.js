@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import ReactDOM from 'react-dom/client';
-import './index.css';
-import './style.css';
+import './styles/style.css';
 import { TabBodyPhase1 } from "./phase1Script";
 
 //displays tabs' bodies
