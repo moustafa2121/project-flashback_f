@@ -29,6 +29,8 @@ function formatDateFromEpoch(epoch, entryType) {
     const date = new Date(epoch * 1000);
     if (entryType === "RE")
       return `${months[date.getMonth()]}, ${date.getFullYear()}`;
+    else if (entryType === "ME")
+        return ''
     return `${months[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()}`;
   }
 

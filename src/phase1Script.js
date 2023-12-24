@@ -54,9 +54,9 @@ function CardIcon({entryType}){
 }
 function CardTitle({date, url, title, summary, entryType}){
     const dateC = formatDateFromEpoch(date, entryType);
-    console.log(entryType);
+    // console.log(entryType);
     let titleClassName = '';
-    if (entryType === "WK" || entryType === "TV" || entryType === "MV")
+    if (entryType === "WK" || entryType === "TV" || entryType === "MV" || entryType === "ME")
         titleClassName = "cardTitle1";
     else if (entryType === "GA")
         titleClassName = "cardTitle2";
@@ -109,19 +109,23 @@ function Card(props){
 function TabBodyPhase1(){
     //list of entries to be retrieved
     const [data, setData] = useState([]);
-    //batches, each scroll is one batch, begins with one
-    const [batch, setbatch] = useState(1);
     //throttles the scrolling, await fetching more data
     const [loading, setLoading] = useState(false);
     //set the year of the data to be retrieved
-    const [year, setYear] = useState(2000);
+    const [year, setYear] = useState(2008);
+    //batches, each scroll is one batch, begins with one
+    const [batch, setbatch] = useState(1);
+    //to display error message if any
+    const [error, setError] = useState(false);
     
     //async fetch data from the api.
     //called on page load and everytime the user
     //reaches a certain point in scrolling
-    const fetchInfo = async () => {
-      console.log(batch);
-      const phase1Url = `http://localhost:55351/2012/${batch}`;
+    //newBatch is true when resetting the previous data, usually
+    //when the year is updated and the old data are obsolete
+    const fetchInfo = async (newBatch=false) => {
+      //console.log(batch);
+      const phase1Url = `http://localhost:55351/${year}/${batch}`;
       setLoading(true);
       try {
         const response = await fetch(phase1Url, {
@@ -131,23 +135,33 @@ function TabBodyPhase1(){
             'Content-Type': 'application/json',
           },
         });
-        //get the new data
-        const newData = await response.json();
-        //append them to the previous data
-        setData(prevData => [...prevData, ...newData]);
-        //increment the batch
-        setbatch(prevBatch => prevBatch + 1);
-      } catch (error) {
-        console.error('Error fetching data:', error);
-      } finally {
-        setLoading(false);
-      }
+        //reset data
+        if (newBatch){ setData([]); }
+
+        //check if the response is valid
+        if (response.ok) {
+            //get the new data
+            const newData = await response.json();
+            //append them to the previous data
+            setData((prevData) => [...prevData, ...newData]);
+            //increment the batch
+            setbatch((prevBatch) => prevBatch + 1);
+          } else {
+            setError(true);
+          }
+        } catch (error) {
+          console.error('Error fetching data:', error);
+        } finally {
+          setLoading(false);
+        }
     }
-    
-    //fetch initial data
+
+    //fetch initial data and fetches data everytime the 
+    //year is updated (usually by the user's input in Phase1Form)
     useEffect(() => {
-      fetchInfo();
-    }, [])
+        // console.log("initial fetch");
+        fetchInfo(true);
+    }, [year])
     
     //event callback function used to fetch data 
     //when the user reaches a certain point in the page
@@ -159,7 +173,7 @@ function TabBodyPhase1(){
       const scrollLimit = 1000;
     
       if (!loading && scrollTop + windowHeight >= (scrollHeight-scrollLimit)) {
-        console.log('At the bottom');
+        // console.log('At the bottom');
         fetchInfo();
       }
     }, 200);
@@ -173,8 +187,10 @@ function TabBodyPhase1(){
     }, [batch, loading]);
     
     //if the data are not loaded/being loaded
-    if (data.length === 0)
-      return <div>Loading...</div>; //todo: loading icon
+    if (error)
+        return <h4>Failed to get data :(</h4>;
+    else if (data.length === 0)
+      return <h4>Loading...</h4>; //todo: loading icon
     
     return (
       <>

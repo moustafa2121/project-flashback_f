@@ -130,8 +130,8 @@ hr{
 /* phase1 input */
 .phase1Form{
   margin: 10px 0 10px 0;
-  padding: 15px;
-  width: 200px;
+  padding: 10px;
+  width: 140px;
   max-width: 80vw;
   max-height:100px;
 
@@ -143,21 +143,35 @@ hr{
   z-index: 5;
 }
 .phase1Form input{
-  width: 45%;
+  width: 55%;
   min-width: 60px;
   padding: 2px 2px 2px 8px;
   margin-right: 0px;
-}
-.phase1Form input, .phase1Form button{
-  color: white;
-}
-.phase1Form button{
-  margin-left: auto;
-}
-.phase1Form input, .phase1Form select, .phase1Form button{
-  background-color: black;
   border: 1px solid gray;
   border-radius: 4px;
   font-family: 'Gambetta', serif;
+  background-color: black;
+  color: white;
+}
+/* remove the arrows from the number input */
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+/* Firefox */
+input[type=number] {
+  -moz-appearance: textfield;
+}
+
+.phase1Form button{
+  color: white;
+  margin-left: auto;
+  border: none;
+  background-color: transparent;
+  scale:1.5;
+  padding-top:0;
+  padding-bottom:5px;
 }
 
