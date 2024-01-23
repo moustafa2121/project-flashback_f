@@ -142,7 +142,7 @@ hr{
   flex-direction: row;
   z-index: 5;
 }
-.phase1Form input{
+.phase1Form input, .phase1Form input{
   width: 55%;
   min-width: 60px;
   padding: 2px 2px 2px 8px;
@@ -165,7 +165,7 @@ input[type=number] {
   -moz-appearance: textfield;
 }
 
-.phase1Form button{
+.phase1Form button, .phase2Form button{
   color: white;
   margin-left: auto;
   border: none;

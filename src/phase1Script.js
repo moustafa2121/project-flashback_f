@@ -124,8 +124,7 @@ function TabBodyPhase1(){
     //newBatch is true when resetting the previous data, usually
     //when the year is updated and the old data are obsolete
     const fetchInfo = async (newBatch=false) => {
-      //console.log(batch);
-      const phase1Url = `http://localhost:55351/${year}/${batch}`;
+      const phase1Url = `http://localhost:50580/${year}/${batch}`;
       setLoading(true);
       try {
         const response = await fetch(phase1Url, {

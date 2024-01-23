@@ -1,24 +1,22 @@
 import React from 'react';
 import './styles/style.css';
 
-const Phase1Form = ({year, setTheYear}) => {
+const Phase2Form = ({storyPrompt, setStoryPrompt}) => {
   const handleFormSubmit = (e) => {
     e.preventDefault();
-    const value = parseInt(e.target[0].value);
-    if (value >= 2000 && value <= 2023)
-        setTheYear(value);
+    //conditions
+      setTheYear(value);
   };
 
   return (
-    <form className="phase1Form" onSubmit={handleFormSubmit}>
+    <form className="phase2Form" onSubmit={handleFormSubmit}>
       <input
-        type="number"
-        id="yearInput"
-        name="yearInput"
-        min="2000"
-        max="2023"
-        step="1"
-        placeholder={year}
+        type="text"
+        id="storyInput"
+        name="storyInput"
+        maxLength="200"
+        minLength="20"
+        placeholder="Story"
       />
       <button type="submit">
       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-clock-history" viewBox="0 0 16 16">
@@ -30,4 +28,4 @@ const Phase1Form = ({year, setTheYear}) => {
     </form>
   );
 };
-export default Phase1Form;
+export default Phase2Form;

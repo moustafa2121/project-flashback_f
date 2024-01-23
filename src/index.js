@@ -2,15 +2,16 @@ import React, { useState } from "react";
 import ReactDOM from 'react-dom/client';
 import './styles/style.css';
 import { TabBodyPhase1 } from "./phase1Script";
+import { TabBodyPhase2 } from "./phase2Script";
 
 //displays tabs' bodies
 function TabBody(props){
-  return(
-    <section className={`tabBody 
-      ${props.active ? "tabBodyActive" : "tabBodyInActive"}`}>
-      {props.id_ === 1 ? <TabBodyPhase1 key={1}/>  : ''}
+  return (
+    <section className={`tabBody ${props.active ? "tabBodyActive" : "tabBodyInActive"}`}>
+      {props.id_ === 1 && props.active ? <TabBodyPhase1 key={1} /> : ''}
+      {props.id_ === 2 && props.active ? <TabBodyPhase2 key={2} /> : ''}
     </section>
-  )
+  );
 }
 
 //displays all tabs' heads
