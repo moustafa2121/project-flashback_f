@@ -1,0 +1,41 @@
+/* phase2 styling */
+
+.storyArticle{
+    border:1px solid gray;
+}
+.storyArticleTitle{
+}
+
+.storyStage{
+    margin:auto;
+    position: relative;
+    margin: 20px 0;
+}
+.storyStageTitle {
+    position: absolute;
+    top: 2%;
+    left: 2%;
+    background: rgb(0, 0, 0);
+    background-color: rgba(0,0,0,0.7);
+    color: #f1f1f1;
+    padding: 10px 15px;
+    margin:0 !important;
+
+}
+.storyStage img{
+    width: auto;
+    height:100vh;
+    margin:auto;
+    display:block;
+}
+.storyStageStory{
+    position: absolute;
+    bottom: 0;
+    background: rgb(0, 0, 0);
+    background: rgba(0, 0, 0, 0.5);
+    color: #f1f1f1;
+    width: 100%;
+    padding: 5px 10px;
+    margin:0;
+    line-height: 16px;
+}

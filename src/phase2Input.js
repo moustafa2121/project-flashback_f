@@ -1,5 +1,5 @@
 import React from 'react';
-import './styles/style.css';
+import './styles/stylePhase2.css';
 
 const Phase2Form = ({storyPrompt, setStoryPrompt}) => {
   const handleFormSubmit = (e) => {

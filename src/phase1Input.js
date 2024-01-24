@@ -1,5 +1,5 @@
 import React from 'react';
-import './styles/style.css';
+import './styles/stylePhase1.css';
 
 const Phase1Form = ({year, setTheYear}) => {
   const handleFormSubmit = (e) => {

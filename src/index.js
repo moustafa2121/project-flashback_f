@@ -28,7 +28,7 @@ function TabHead(props){
 }
 //main componenet that returns the tabs' head and bodies
 function Tabs(props){
-  const [active, setActive] = useState(1);
+  const [active, setActive] = useState(2);
 
   const tabsInfo = [
     {id_:1, title:"Throwback", 

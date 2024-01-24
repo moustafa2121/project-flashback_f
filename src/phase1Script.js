@@ -1,6 +1,6 @@
 //handles phase1 
 //exports the tab body component of phase1
-import './styles/style_card.css';
+import './styles/stylePhase1.css';
 
 import { formatDateFromEpoch } from "./helper";
 import React, { useState, useEffect } from "react";

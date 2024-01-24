@@ -1,17 +1,59 @@
-
 //handles phase2
 //exports the tab body component of phase2
 
 import React, { useState, useEffect } from "react";
 import { throttle } from 'lodash';
+import './styles/stylePhase2.css';
 // import Phase2Form from './phase2Input';
 
+
  //a stage in the story
+ //contains a div that contains the stage title,
+ //stage image and stage contents
 function StoryStage(props){
+  //img URL
+  const [imageSrc, setImageSrc] = useState(null);
+
+  //fetch the image
+  const fetchInfo = async () => {
+    const imgUrl = `http://localhost:53955/getImage/${props.storyId}/${props.stageNumber}`;
+    try {
+      const response = await fetch(imgUrl, {
+        method: 'GET',
+        credentials: 'include', //cookie
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      
+      //check if the response is valid
+      if (response.ok) {
+          const blob = await response.blob();
+          setImageSrc(URL.createObjectURL(blob));        
+        } else {
+          console.error('Failed to fetch image');
+        }
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      } finally {//remove finally
+      }
+    }
+
+    //fetch images on load
+    useEffect(()=> {
+      fetchInfo();
+    }, [])
+
   return(
-    <p>
-      {props.stageTitle}
-    </p>
+    <div class="storyStage">
+      <h4 class="storyStageTitle">
+        {props.stageTitle}
+      </h4>
+      <img src={imageSrc} alt="stage img"></img>
+      <p class="storyStageStory">
+        {props.stageStory}
+      </p>
+    </div>
   )
 }
 
@@ -21,12 +63,12 @@ function Story(props){
   const story = props[Object.keys(props).length - 1];
 
   return(
-    <>    
-      <h1>
+    <article class="storyArticle" id={story.storyId}>
+      <h3 class="storyArticleTitle">
         {story.storyPrompt}
-      </h1>
-      {storyStages.map(entry => <StoryStage {...entry} /> )}
-    </>
+      </h3>
+      {storyStages.map(entry => <StoryStage {...entry} storyId={story.storyId} /> )}
+    </article>
 
   )
 }
