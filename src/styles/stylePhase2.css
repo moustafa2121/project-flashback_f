@@ -2,14 +2,22 @@
 
 .storyArticle{
     border:1px solid gray;
+    width:50vw;
+    position: relative;
 }
 .storyArticleTitle{
 }
-
+.displayNone{
+    display:none;
+}
 .storyStage{
     margin:auto;
     position: relative;
     margin: 20px 0;
+    display:none;
+}
+.storyStageActive{
+    display:block;
 }
 .storyStageTitle {
     position: absolute;
@@ -20,13 +28,12 @@
     color: #f1f1f1;
     padding: 10px 15px;
     margin:0 !important;
-
 }
 .storyStage img{
+    display:block;
     width: auto;
     height:100vh;
     margin:auto;
-    display:block;
 }
 .storyStageStory{
     position: absolute;
@@ -38,4 +45,55 @@
     padding: 5px 10px;
     margin:0;
     line-height: 16px;
+}
+
+.cursor {
+    cursor: pointer;
+}
+.prev, .next {
+    cursor: pointer;
+    position: absolute;
+    top: 50%;
+    width: auto;
+    padding: 16px;
+    margin-top: -50px;
+    color: white;
+    font-weight: bold;
+    font-size: 20px;
+    border-radius: 0 3px 3px 0;
+    user-select: none;
+    -webkit-user-select: none;
+    z-index:100;
+}
+
+.next {
+    right: 0;
+    border-radius: 3px 0 0 3px;
+}
+.prev:hover, .next:hover {
+    background-color: rgba(0, 0, 0, 0.8);
+}
+
+.dotCotnainer{
+    text-align: center;
+}
+.dot {
+    cursor: default;
+    pointer-events: none;
+    height: 12px;
+    width: 12px;
+    margin: 0 2px;
+    border-radius: 50%;
+    border:1px solid #717171;
+    display: inline-block;
+    transition: background-color 0.6s ease;
+}
+.dotLoaded{
+    pointer-events: all;
+    cursor: pointer;
+    background-color: #717171;
+}
+.dotActive, .dotLoaded:hover {
+    background-color: #bbb !important;
+    border:1px solid #bbb;
 }

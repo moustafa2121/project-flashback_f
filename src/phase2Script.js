@@ -2,7 +2,7 @@
 //exports the tab body component of phase2
 
 import React, { useState, useEffect } from "react";
-import { throttle } from 'lodash';
+// import { throttle } from 'lodash';
 import './styles/stylePhase2.css';
 // import Phase2Form from './phase2Input';
 
@@ -12,7 +12,7 @@ import './styles/stylePhase2.css';
  //stage image and stage contents
 function StoryStage(props){
   //img URL
-  const [imageSrc, setImageSrc] = useState(null);
+  const [imgSrc, setImgSrc] = useState(null);
 
   //fetch the image
   const fetchInfo = async () => {
@@ -29,31 +29,42 @@ function StoryStage(props){
       //check if the response is valid
       if (response.ok) {
           const blob = await response.blob();
-          setImageSrc(URL.createObjectURL(blob));        
+          setImgSrc(URL.createObjectURL(blob));        
         } else {
           console.error('Failed to fetch image');
         }
       } catch (error) {
         console.error('Error fetching data:', error);
-      } finally {//remove finally
+      } finally {
+        props.updateStagesActive(props.stageNumber-1, 1)
       }
-    }
+  }
+  //fetch images on load
+  useEffect(()=> {
+    fetchInfo();
+  }, [])
 
-    //fetch images on load
-    useEffect(()=> {
-      fetchInfo();
-    }, [])
-
+  const cl = props.slideIndex === props.stageNumber ? 'storyStageActive' : '';
+  const c2 = imgSrc === null ? 'displayNone' : '';
+  const imgSrcUrl = imgSrc !== null ? imgSrc : 'loadingImg.jpg'
   return(
-    <div class="storyStage">
-      <h4 class="storyStageTitle">
-        {props.stageTitle}
+    <div className={`storyStage ${cl}`}>
+      <h4 className={`storyStageTitle ${c2}`}>
+        {props.stageNumber} - {props.stageTitle}
       </h4>
-      <img src={imageSrc} alt="stage img"></img>
-      <p class="storyStageStory">
+      <img src={imgSrcUrl} alt="stage img"></img>
+      <p className={`storyStageStory ${c2}`}>
         {props.stageStory}
       </p>
     </div>
+  )
+}
+
+function Dot({stageNumber, slideIndex, storyStagesActive, setSlideIndex}){
+  const cl = slideIndex === stageNumber ? 'dotActive' : '';
+  const c2 = storyStagesActive[stageNumber-1] === 1 ? 'dotLoaded' : '';
+  return (
+    <span className={`dot ${cl} ${c2}`} onClick={() => setSlideIndex(stageNumber)}></span>
   )
 }
 
@@ -61,15 +72,41 @@ function StoryStage(props){
 function Story(props){
   const storyStages = Object.values(props).slice(0, 5);
   const story = props[Object.keys(props).length - 1];
+  //
+  const [storyStagesActive, setStoryStagesActive] = useState(() => Array.from({ length: storyStages.length }, () => 0));
+
+  const updateStagesActive = (index, newValue) => {
+    setStoryStagesActive(prevArray => {
+      const newArrayCopy = [...prevArray];
+      newArrayCopy[index] = newValue;
+      return newArrayCopy;
+    });
+  };
+
+  //handle the sliding of the iamges
+  const [slideIndex, setSlideIndex] = useState(1);
+  //next/prev button, inc/dec the slide value
+  function plusSlides(n) {
+    if (slideIndex >= storyStages.length && n === 1)
+      setSlideIndex(1);
+    else if (slideIndex === 1 && n === -1)
+      setSlideIndex(storyStages.length);
+    else
+      setSlideIndex(prevIndex => prevIndex += n);
+  }
 
   return(
-    <article class="storyArticle" id={story.storyId}>
-      <h3 class="storyArticleTitle">
+    <article className="storyArticle" id={story.storyId}>
+      <h3 className="storyArticleTitle">
         {story.storyPrompt}
       </h3>
-      {storyStages.map(entry => <StoryStage {...entry} storyId={story.storyId} /> )}
+      <a className="prev" onClick={() => plusSlides(-1)}>&#10094;</a>
+      <a className="next" onClick={() => plusSlides(1)}>&#10095;</a>
+      {storyStages.map(entry => <StoryStage {...entry} storyStagesActive={storyStagesActive} updateStagesActive={updateStagesActive} storyId={story.storyId} slideIndex={slideIndex} /> )}
+      <div className="dotCotnainer">
+        {storyStages.map(dot => <Dot {...dot} storyStagesActive={storyStagesActive} slideIndex={slideIndex} setSlideIndex={setSlideIndex}/>)}
+      </div>
     </article>
-
   )
 }
 
@@ -83,7 +120,7 @@ function TabBodyPhase2(){
     //throttles the scrolling, await fetching more data
     const [loading, setLoading] = useState(false);
     //set the story prompt of the data to be retrieved
-    const [storyPrompt, setStoryPrompt] = useState("Story");
+    // const [storyPrompt, setStoryPrompt] = useState("Story");
     //batches, each scroll is one batch, begins with one (a batch is a story)
     const [storyNumber, setStoryNumber] = useState(0);
     //to display error message if any
@@ -94,7 +131,7 @@ function TabBodyPhase2(){
     //reaches a certain point in scrolling
     //newBatch is true when resetting the previous data, usually
     //when new story is generated is updated and the old data are obsolete
-    const fetchInfo = async (newBatch=false) => {
+    const fetchInfo = async () => {
       const phase2Url = `http://localhost:53955/${storyNumber}`;
       setLoading(true);
       try {
@@ -129,7 +166,7 @@ function TabBodyPhase2(){
 
     //fetch initial data and fetches data everytime the 
     useEffect(() => {
-        fetchInfo(true);
+        fetchInfo();
     }, [])
     
     //event callback function used to fetch data 
