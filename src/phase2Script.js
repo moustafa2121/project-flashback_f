@@ -2,7 +2,7 @@
 //exports the tab body component of phase2
 
 import React, { useState, useEffect } from "react";
-// import { throttle } from 'lodash';
+import { throttle } from 'lodash';
 import './styles/stylePhase2.css';
 // import Phase2Form from './phase2Input';
 
@@ -102,20 +102,18 @@ function Story(props){
       </h3>
       <a className="prev" onClick={() => plusSlides(-1)}>&#10094;</a>
       <a className="next" onClick={() => plusSlides(1)}>&#10095;</a>
-      {storyStages.map(entry => <StoryStage {...entry} storyStagesActive={storyStagesActive} updateStagesActive={updateStagesActive} storyId={story.storyId} slideIndex={slideIndex} /> )}
+      {storyStages.map(entry => <StoryStage {...entry} storyStagesActive={storyStagesActive} updateStagesActive={updateStagesActive} storyId={story.storyId} slideIndex={slideIndex} key={entry.stageNumber}/> )}
       <div className="dotCotnainer">
-        {storyStages.map(dot => <Dot {...dot} storyStagesActive={storyStagesActive} slideIndex={slideIndex} setSlideIndex={setSlideIndex}/>)}
+        {storyStages.map(dot => <Dot {...dot} storyStagesActive={storyStagesActive} slideIndex={slideIndex} setSlideIndex={setSlideIndex} key={dot.stageNumber}/>)}
       </div>
     </article>
   )
 }
 
-//the component of phase2
-//it displays all the stories (and their stages),
-// handles user input, and fetches more data 
-//when the user scrolls
-function TabBodyPhase2(){
-    //list of entries to be retrieved
+//it displays all the old stories (and their stages),
+//fetches more data when the user scrolls
+function OldStories(){
+//list of entries to be retrieved
     const [data, setData] = useState([]);
     //throttles the scrolling, await fetching more data
     const [loading, setLoading] = useState(false);
@@ -125,13 +123,17 @@ function TabBodyPhase2(){
     const [storyNumber, setStoryNumber] = useState(0);
     //to display error message if any
     const [error, setError] = useState(false);
-    
+    //if the server does not return anymore stories, this variable will stop further requests
+    const [noMoreStories, setNoMoreStories] = useState(false);
+
     //async fetch data from the api.
     //called on page load and everytime the user
     //reaches a certain point in scrolling
     //newBatch is true when resetting the previous data, usually
     //when new story is generated is updated and the old data are obsolete
     const fetchInfo = async () => {
+      if (noMoreStories)
+        return;
       const phase2Url = `http://localhost:53955/${storyNumber}`;
       setLoading(true);
       try {
@@ -142,10 +144,6 @@ function TabBodyPhase2(){
             'Content-Type': 'application/json',
           },
         });
-        
-        //reset data
-        // if (newBatch){ setData([]); }
-        
         //check if the response is valid
         if (response.ok) {
             //get the new data
@@ -153,18 +151,21 @@ function TabBodyPhase2(){
             //append them to the previous data
             setData((prevData) => [...prevData, ...newData]);
             //increment the story number
-            setStoryNumber(prevNum => prevNum + 1);
+            setStoryNumber((prevNum) => prevNum + 1);
+          } else if (response.status === 404) {//no more stories
+            // console.error('Not Found:', response.statusText);
+            setNoMoreStories(true);
           } else {
             setError(true);
           }
-        } catch (error) {
-          console.error('Error fetching data:', error);
+        } catch (errorReq) {
+          console.error('Error fetching data:', errorReq);
         } finally {
-          setLoading(false);
+            setLoading(false);
         }
     }
 
-    //fetch initial data and fetches data everytime the 
+    //fetch initial data 
     useEffect(() => {
         fetchInfo();
     }, [])
@@ -172,26 +173,26 @@ function TabBodyPhase2(){
     //event callback function used to fetch data 
     //when the user reaches a certain point in the page
     //it uses debounce to throttle calls to the api
-    // const handleScroll = throttle(() => {
-    //   const scrollHeight = document.documentElement.scrollHeight;
-    //   const scrollTop = document.documentElement.scrollTop;
-    //   const windowHeight = window.innerHeight;
-    //   const scrollLimit = 1000;
+    const handleScroll = throttle(() => {
+      const scrollHeight = document.documentElement.scrollHeight;
+      const scrollTop = document.documentElement.scrollTop;
+      const windowHeight = window.innerHeight;
+      const scrollLimit = 1000;
     
-    //   if (!loading && scrollTop + windowHeight >= (scrollHeight-scrollLimit)) {
-    //     // console.log('At the bottom');
-    //     fetchInfo();
-    //   }
-    // }, 200);
+      if (!loading && scrollTop + windowHeight >= (scrollHeight-scrollLimit)) {
+        console.log('At the bottom');
+        fetchInfo();
+      }
+    }, 200);
 
-    //set the scrolling event
-    // useEffect(() => {
-    //   window.addEventListener('scroll', handleScroll);
-    //   return () => {
-    //     window.removeEventListener('scroll', handleScroll);
-    //   };
-    // }, [batch, loading]);
-    
+    // set the scrolling event
+    useEffect(() => {
+      window.addEventListener('scroll', handleScroll);
+      return () => {
+        window.removeEventListener('scroll', handleScroll);
+      };
+    }, [storyNumber, loading]);
+
     //if the data are not loaded/being loaded
     if (error)
         return <h4>Failed to get data :(</h4>;
@@ -200,12 +201,58 @@ function TabBodyPhase2(){
     
     return (
       <>
-        {/* <Phase2Form storyPrompt={storyPrompt} setStoryPrompt={setStoryPrompt}/> */}
-        <h4>One upon a time.....</h4>
-        <hr/>
         {data.map(entry => <Story {...entry} key={entry.entryId}/>)}
       </>
     )
-  }
+}
 
-  export {TabBodyPhase2};
+//the component of phase2
+//it displays all the stories (and their stages),
+// handles user input, and fetches more data 
+//when the user scrolls
+function TabBodyPhase2(){
+    {/* <Phase2Form storyPrompt={storyPrompt} setStoryPrompt={setStoryPrompt}/> */}
+    
+    return(
+      <>
+        <h4>One upon a time.....</h4>
+        <hr/>
+        <OldStories key={'stories'}/>
+      </>
+    )
+}
+
+  
+
+export {TabBodyPhase2};
+
+
+/*
+function TabBodyPhase2(){
+    useEffect(() => {
+      console.log("Start");
+      const eventSource = new EventSource('http://localhost:53955/sse-endpoint');
+  
+      eventSource.onmessage = (event) => {
+        console.log(event.data);
+        // const stageData = JSON.parse(event.data);
+        // console.log(stageData);
+      };
+  
+      eventSource.onerror = (error) => {
+        console.error('Error with SSE:', error);
+        eventSource.close();
+        
+      };
+  
+      return () => {
+        console.log('Cleanup: Closing EventSource');
+        eventSource.close();
+      };
+    }, []);
+  
+    return(
+      <p>olo</p>
+    )
+  }
+*/
