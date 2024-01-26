@@ -1,11 +1,23 @@
 //helper functions script
 
-//handles the jump to top button
-(()=>{
+//basic fetch of data from a url
+async function fetchData(url){
+    return fetch(url, {
+        method: 'GET',
+        credentials: 'include', //cookie
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    })
+}
+
+
+//button that handles the jump to top
+(() => {
     const topButton = document.getElementById("jumpTopBtn");
     topButton.style.display = "none";
     const scrollPoint = 200;
-    //shows the button at certain point
+    //shows the button at certain point when scrolling
     window.onscroll = () => {
         if (document.body.scrollTop > scrollPoint || document.documentElement.scrollTop > scrollPoint)
             topButton.style.display = "block";
@@ -34,4 +46,4 @@ function formatDateFromEpoch(epoch, entryType) {
     return `${months[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()}`;
   }
 
-  export {formatDateFromEpoch};
+  export {formatDateFromEpoch, fetchData};

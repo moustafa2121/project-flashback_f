@@ -1,10 +1,14 @@
+//the main script, calls on different phases of the webapp
 import React, { useState } from "react";
 import ReactDOM from 'react-dom/client';
 import './styles/style.css';
 import { TabBodyPhase1 } from "./phase1Script";
 import { TabBodyPhase2 } from "./phase2Script";
 
-//displays tabs' bodies
+//displays tabs' bodies (each body is a phase, stand-alone app)
+//as if currently, each phase is loaded when the tab is clicked on
+//meaning each time the user switches between a phase it 'resets'
+//the only reason for this is stop users from overloading the backend
 function TabBody(props){
   return (
     <section className={`tabBody ${props.active ? "tabBodyActive" : "tabBodyInActive"}`}>
@@ -14,7 +18,8 @@ function TabBody(props){
   );
 }
 
-//displays all tabs' heads
+//displays a tab head, clicking on a tab head will
+//switch between different phases
 function TabHead(props){
   return (
   <li className="nav-item">
@@ -26,22 +31,28 @@ function TabHead(props){
     </a>
   </li>)
 }
-//main componenet that returns the tabs' head and bodies
-function Tabs(props){
-  const [active, setActive] = useState(2);
 
+//main componenet that returns the tabs' head and bodies
+//each tab (head + body) is called a phase: a stand-alone app
+//that provides unique features different from other tabs/phases
+function Tabs(){
+  //which tab is active
+  const [activeTab, setActiveTab] = useState(2);
+
+  //data specifying each tab
   const tabsInfo = [
     {id_:1, title:"Throwback", 
-      active: active === 1,
-      onClick: () => setActive(1)},
+      active: activeTab === 1,
+      onClick: () => setActiveTab(1)},
     {id_:2, title:"Lens Into The Past", 
-      active: active === 2,
-      onClick: () => setActive(2)},
+      active: activeTab === 2,
+      onClick: () => setActiveTab(2)},
     {id_:3, title:"Phase3", 
-    active: active === 3, disabled: true,
-    onClick: () => setActive(3)},
+    active: activeTab === 3, disabled: true,
+    onClick: () => setActiveTab(3)},
   ]
 
+  //get the tab heads and tab bodies
   return (
     <>
       <nav>
