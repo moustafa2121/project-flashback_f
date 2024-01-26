@@ -1,10 +1,10 @@
 //handles phase2
 //exports the tab body component of phase2
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { throttle } from 'lodash';
 import './styles/stylePhase2.css';
-// import Phase2Form from './phase2Input';
+import Phase2Form from './phase2Input';
 
 
  //a stage in the story
@@ -13,11 +13,11 @@ import './styles/stylePhase2.css';
 function StoryStage(props){
   //img URL
   const [imgSrc, setImgSrc] = useState(null);
-
   //fetch the image
   const fetchInfo = async () => {
     const imgUrl = `http://localhost:53955/getImage/${props.storyId}/${props.stageNumber}`;
     try {
+      console.log("rquesting: ", imgUrl);
       const response = await fetch(imgUrl, {
         method: 'GET',
         credentials: 'include', //cookie
@@ -30,14 +30,14 @@ function StoryStage(props){
       if (response.ok) {
           const blob = await response.blob();
           setImgSrc(URL.createObjectURL(blob));        
-        } else {
+      } else {
           console.error('Failed to fetch image');
-        }
-      } catch (error) {
-        console.error('Error fetching data:', error);
-      } finally {
-        props.updateStagesActive(props.stageNumber-1, 1)
       }
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    } finally {
+      props.updateStagesActive(props.stageNumber-1, 1)
+    }
   }
   //fetch images on load
   useEffect(()=> {
@@ -72,7 +72,7 @@ function Dot({stageNumber, slideIndex, storyStagesActive, setSlideIndex}){
 function Story(props){
   const storyStages = Object.values(props).slice(0, 5);
   const story = props[Object.keys(props).length - 1];
-  //
+  
   const [storyStagesActive, setStoryStagesActive] = useState(() => Array.from({ length: storyStages.length }, () => 0));
 
   const updateStagesActive = (index, newValue) => {
@@ -117,8 +117,6 @@ function OldStories(){
     const [data, setData] = useState([]);
     //throttles the scrolling, await fetching more data
     const [loading, setLoading] = useState(false);
-    //set the story prompt of the data to be retrieved
-    // const [storyPrompt, setStoryPrompt] = useState("Story");
     //batches, each scroll is one batch, begins with one (a batch is a story)
     const [storyNumber, setStoryNumber] = useState(0);
     //to display error message if any
@@ -206,18 +204,65 @@ function OldStories(){
     )
 }
 
+function CurrentStory({storyPrompt}){
+  const isFirstRender = useRef(true)
+  const [renderComponent, setRenderComponent] = useState(<p>olo</p>);
+
+  useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
+    console.log("Start");
+    const fetchInfo = async () => {
+      const fetchUrl = `http://localhost:53955/makeRequest/${storyPrompt}`;
+      try {
+        const response = await fetch(fetchUrl, {
+          method: 'GET',
+          credentials: 'include', //cookie
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+        //check if the response is valid
+        if (response.ok) {
+            //get the new data
+            const newData = await response.json();
+            console.log("-----",newData[0]);
+            setRenderComponent(<Story {...newData[0]} />);
+            // //append them to the previous data
+            // setData((prevData) => [...prevData, ...newData]);
+          } else if (response.status === 404) {//no more stories
+            console.error('Not Found:', response.statusText);
+          } 
+        } catch (errorReq) {
+          console.error('Error fetching data:', errorReq);
+        } finally {
+        }
+    }
+    
+    fetchInfo();    
+
+  }, [storyPrompt]);
+
+  return renderComponent;
+}
+
 //the component of phase2
 //it displays all the stories (and their stages),
 // handles user input, and fetches more data 
 //when the user scrolls
 function TabBodyPhase2(){
-    {/* <Phase2Form storyPrompt={storyPrompt} setStoryPrompt={setStoryPrompt}/> */}
-    
+    //set the story prompt of the data to be retrieved
+    const [storyPrompt, setStoryPrompt] = useState("Story");
+
     return(
       <>
+        <Phase2Form setStoryPrompt={setStoryPrompt}/>
+        <CurrentStory storyPrompt={storyPrompt}/>
         <h4>One upon a time.....</h4>
         <hr/>
-        <OldStories key={'stories'}/>
+        {/* <OldStories key={'stories'}/> */}
       </>
     )
 }
@@ -228,31 +273,21 @@ export {TabBodyPhase2};
 
 
 /*
-function TabBodyPhase2(){
-    useEffect(() => {
-      console.log("Start");
-      const eventSource = new EventSource('http://localhost:53955/sse-endpoint');
-  
-      eventSource.onmessage = (event) => {
-        console.log(event.data);
-        // const stageData = JSON.parse(event.data);
-        // console.log(stageData);
-      };
-  
-      eventSource.onerror = (error) => {
-        console.error('Error with SSE:', error);
-        eventSource.close();
-        
-      };
-  
-      return () => {
-        console.log('Cleanup: Closing EventSource');
-        eventSource.close();
-      };
-    }, []);
-  
-    return(
-      <p>olo</p>
-    )
-  }
+const eventSource = new EventSource('http://localhost:53955/sse-endpoint');
+
+    eventSource.onmessage = (event) => {
+      console.log(event.data);
+      // const stageData = JSON.parse(event.data);
+      // console.log(stageData);
+    };
+
+    eventSource.onerror = (error) => {
+      console.error('Error with SSE:', error);
+      eventSource.close();
+    };
+
+    return () => {
+      console.log('Cleanup: Closing EventSource');
+      eventSource.close();
+    };
 */
