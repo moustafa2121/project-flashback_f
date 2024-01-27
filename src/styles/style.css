@@ -1,8 +1,10 @@
+/* general styling for the app */
+
 body {
   height: 100vh;
   width: 100vw;
   max-width: 100%;
-  max-height:100%;
+  max-height: 100%;
   background-color: #282c34;
 
   /* hide scrollbar for IE, Edge and Firefox */
@@ -13,7 +15,10 @@ body {
 body::-webkit-scrollbar {
   display: none;
 }
+
+/* encompasses the enite app except for the heading and jumpTopBtn button */
 #root{
+  /* 4vh for the heading  */
   padding: 4vh 10vw 0 10vw;
 }
 /* jumps to the top bottom and its arrow */
@@ -41,7 +46,7 @@ body::-webkit-scrollbar {
   background-color: darkgray;
 }
 
-/* the title of the page */
+/* the header/top of the page */
 header {
   height: 20vh;
   width: 100%;
@@ -67,23 +72,24 @@ header {
   user-select: none
 }
 
+
 /* tabs' heads */
 #tabLst{
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-wrap: nowrap;
+}
+.nav-item, .nav-item > a{
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .nav-item > a {
   cursor: default;
   font-weight: 500;
   color: #c8cad1;
-  user-select: none
-}
-.nav-item > a.inActiveTab:hover {
-  color: #c8cad1;
-  border-color: gray;
-  text-decoration: underline;
-  text-underline-offset: 0.15em;
+  user-select: none;
 }
 .nav-item > a.activeTab{
   border-right: 1px solid gray;
@@ -95,18 +101,25 @@ header {
 .nav-item > a.inActiveTab{
   border-bottom: 1px solid gray;
 }
+.nav-item > a.inActiveTab:hover {
+  color: #c8cad1;
+  border-color: gray;
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
 
 /* tabs' bodies */
 .tabBody{
   width:100%;
   color: white;
   padding-top: 20px;
-
   display: flex;
   align-items: center;
   justify-content: center;
   flex-direction: column;
 }
+/* sets the display of active and inactive tab bodies
+only one active body at a time */
 .tabBodyActive{
   display: flex;
 }
@@ -118,11 +131,22 @@ h4{
   font-family: 'Gambetta', serif;
   padding: 0;
   margin: 25px 0px 5px 0;
+  text-transform: capitalize; 
 }
+/* line that seperates the form/title of the tab and the contents below */
 hr{
   padding: 0;
   margin: 0 0 15px 0;
   border: 1px solid white;
   width:370px;
   max-width:80vw;
+}
+
+@media only screen and (max-width: 585px) {
+  #root{
+    padding: 4vh 2vw 0 2vw;
+  }
+  #tabLst li a {
+    padding: 8px 10px;
+  }
 }

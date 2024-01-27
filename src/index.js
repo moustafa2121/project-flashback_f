@@ -47,7 +47,7 @@ function Tabs(){
     {id_:2, title:"Lens Into The Past", 
       active: activeTab === 2,
       onClick: () => setActiveTab(2)},
-    {id_:3, title:"Phase3", 
+    {id_:3, title:"Newspaper Clippings", 
     active: activeTab === 3, disabled: true,
     onClick: () => setActiveTab(3)},
   ]

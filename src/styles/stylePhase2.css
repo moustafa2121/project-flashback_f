@@ -1,24 +1,38 @@
 /* phase2 styling */
 
+/* article that holds the story's stages */
 .storyArticle{
-    border:1px solid gray;
-    width:50vw;
+    width: auto;
+    max-width: 100vw;
     position: relative;
+    margin: 20px;
 }
+
+/* the title of the story */
 .storyArticleTitle{
+    text-align:left;
+    font-size: 28px; 
+    letter-spacing: -1px; 
+    line-height: 25px !important;
+    color: white; 
+    text-transform: capitalize; 
+    margin: 5px auto; 
+    padding: 0 10px 5px;
+    text-align: center; 
+    line-height: 50px
 }
-.displayNone{
-    display:none;
-}
+
+/* a stage of the story */
 .storyStage{
-    margin:auto;
     position: relative;
-    margin: 20px 0;
+    margin: 0;
     display:none;
 }
+/* the current stage that is displayed */
 .storyStageActive{
     display:block;
 }
+/* title that is show on upper left of each stage */
 .storyStageTitle {
     position: absolute;
     top: 2%;
@@ -29,27 +43,48 @@
     padding: 10px 15px;
     margin:0 !important;
 }
+
+/* the image of the stage */
 .storyStage img{
-    display:block;
+    display: block;
     width: auto;
-    height:100vh;
     margin:auto;
+    height: 80vh;
 }
+/* the text of the stage */
 .storyStageStory{
     position: absolute;
     bottom: 0;
     background: rgb(0, 0, 0);
     background: rgba(0, 0, 0, 0.5);
     color: #f1f1f1;
-    width: 100%;
+    width: auto;
     padding: 5px 10px;
     margin:0;
     line-height: 16px;
+    max-height: 30vh;
+
+    /* limit the text lines */
+    display: -webkit-box;
+    -webkit-line-clamp: 6;
+    -webkit-box-orient: vertical;
+    overflow-y: scroll;
+}
+/* style the scroll bar for the story */
+::-webkit-scrollbar {
+    width: 2px;
+}
+::-webkit-scrollbar-track {
+    background: black; 
+}
+::-webkit-scrollbar-thumb {
+    background: gray; 
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #555; 
 }
 
-.cursor {
-    cursor: pointer;
-}
+/* prev/next buttons to rotate through images */
 .prev, .next {
     cursor: pointer;
     position: absolute;
@@ -64,16 +99,17 @@
     user-select: none;
     -webkit-user-select: none;
     z-index:100;
+    background-color: rgba(0, 0, 0, 0.6);
 }
-
+.prev:hover, .next:hover {
+    background-color: rgba(0, 0, 0, 1.0);
+}
 .next {
     right: 0;
     border-radius: 3px 0 0 3px;
 }
-.prev:hover, .next:hover {
-    background-color: rgba(0, 0, 0, 0.8);
-}
 
+/* the 'dot' circles that represent images at the bottom */
 .dotCotnainer{
     text-align: center;
 }
@@ -96,4 +132,16 @@
 .dotAvailable, .dotLoaded:hover {
     background-color: #bbb !important;
     border:1px solid #bbb;
+}
+
+/* general */
+.displayNone{
+    display:none;
+}
+
+@media only screen and (max-width: 585px) {
+    .storyStage img{
+        width: 100%;
+        height: auto;
+    }
 }
