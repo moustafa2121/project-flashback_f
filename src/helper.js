@@ -2,6 +2,58 @@
 
 import React from 'react';
 
+//base url for each phase
+const BaseUrl = (() => {
+    return {
+        phase1: 'http://localhost:50580/',
+        phase2: 'http://localhost:60846/',
+    }
+})();
+
+/*
+a closure that tracks when the user can make another request/prompt in 
+phase2. this is to limit how many times the user can request.
+The limit is set by the backend and tracks the user's cookie.
+if the user prompts and the backend response 429, this closure will
+be used to set variables in the sessionStorage to prevent showing the 
+prompting form. if the user comes back again (or refreshes) after the time 
+has passed, then the form will be shown again
+*/
+const requestLimitTracker = (() => {
+    //set the tracker time and the reason for the limit reached
+    const setTracker = (seconds, reason) => {
+        const currentTime = new Date();
+        const futureTime = new Date(currentTime.getTime() + seconds * 1000);
+        sessionStorage.setItem("timeReset", futureTime);
+        sessionStorage.setItem("reason", reason);
+    }
+    //checks if the time has passed, usually called when page loads
+    const hasTimePassed = () => {
+        if (sessionStorage.getItem("timeReset")){
+            return new Date(sessionStorage.getItem("timeReset")) < new Date();
+        }
+        return true;
+    }
+    //assumes that hasTimePassed function has already been invoked
+    //returns a message instead of the form, infroming the user when to
+    //come back for more prompts
+    const timeComp = () =>{
+        let text = ''
+        if (sessionStorage.getItem("reason") === 'request limit')
+            text = `Request limit has reached for the day. Try again on ${formatDate(sessionStorage.getItem("timeReset"))}`
+        else
+            text = "You've made too many requests recently. Try again in few minutes."
+        return (<h4 id="requestLimitMessage">{text}</h4>)
+    }
+
+    //return variables of the closure
+    return {
+        setTracker: (seconds, reason) => setTracker(seconds, reason),
+        hasTimePassed: () => hasTimePassed(),
+        timeComp: () => timeComp()
+    }
+})();
+
 //basic fetch of data from a url
 async function fetchData(url){
     return fetch(url, {
@@ -26,7 +78,7 @@ function SubmitButton(){
     )
 }
 
-//button that handles the jump to top
+//handles the jump to top button
 (() => {
     const topButton = document.getElementById("jumpTopBtn");
     topButton.style.display = "none";
@@ -58,6 +110,20 @@ function formatDateFromEpoch(epoch, entryType) {
     else if (entryType === "ME")
         return ''
     return `${months[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()}`;
-  }
+}
 
-  export {formatDateFromEpoch, fetchData, SubmitButton};
+function formatDate(date) {
+    date = new Date(date)
+    const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+
+    const dayOfWeek = daysOfWeek[date.getDay()];
+    const dayOfMonth = date.getDate();
+    const month = months[date.getMonth()];
+    const hours = date.getHours().toString().padStart(2, '0');
+    const minutes = date.getMinutes().toString().padStart(2, '0');
+
+    return `${dayOfWeek}, ${dayOfMonth}th of ${month} at ${hours}:${minutes}`;
+}
+
+export {formatDateFromEpoch, fetchData, SubmitButton, BaseUrl, requestLimitTracker};

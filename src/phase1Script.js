@@ -3,7 +3,7 @@
 //currently only shows for the years 2000-2023
 import './styles/stylePhase1.css';
 
-import { formatDateFromEpoch, fetchData } from "./helper";
+import { formatDateFromEpoch, fetchData, BaseUrl } from "./helper";
 import React, { useState, useEffect } from "react";
 import { throttle } from 'lodash';
 import Phase1Form from './phase1Input';
@@ -135,7 +135,7 @@ function TabBodyPhase1(){
   const fetchInfo = async (newBatch=false) => {
     if (noMoreEntries)
       return;
-    const phase1Url = `http://localhost:50580/${year}/${batch}`;
+    const phase1Url = BaseUrl.phase1 + `${year}/${batch}`;
     setFetchingData(true);
     try {
       const response = await fetchData(phase1Url);

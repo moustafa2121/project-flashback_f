@@ -139,6 +139,11 @@
     display:none;
 }
 
+#requestLimitMessage{
+    font-size: 0.9em;
+    max-width: 50vw;
+}
+
 @media only screen and (max-width: 585px) {
     .storyStage img{
         width: 100%;

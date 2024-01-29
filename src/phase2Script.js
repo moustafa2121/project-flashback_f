@@ -8,7 +8,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { throttle } from 'lodash';
 import './styles/stylePhase2.css';
 import Phase2Form from './phase2Input';
-import { fetchData } from "./helper";
+import { fetchData, BaseUrl, requestLimitTracker } from "./helper";
 
 
  //a stage in the story
@@ -20,7 +20,7 @@ function StoryStage(props){
   const [imgSrc, setImgSrc] = useState(null);
   //fetch the image
   const fetchInfo = async () => {
-    const imgUrl = `http://localhost:53955/getImage/${props.storyId}/${props.stageNumber}`;
+    const imgUrl = BaseUrl.phase2 +`getImage/${props.storyId}/${props.stageNumber}`;
     try {
       console.log("StoryStage rquesting: ", imgUrl);
       const response = await fetchData(imgUrl);
@@ -148,7 +148,7 @@ function OldStories(){
   const fetchInfo = async () => {
     if (noMoreStories)
       return;
-    const phase2Url = `http://localhost:53955/${storyNumber}`;
+    const phase2Url = BaseUrl.phase2 + `${storyNumber}`;
     setFetchingData(true);
     try {
       const response = await fetchData(phase2Url);
@@ -161,6 +161,7 @@ function OldStories(){
           //increment the story number
           setStoryNumber(prevNum => prevNum + 1);
         } else if (response.status === 404) {//no more stories
+          // console.error('Not Found:', response.statusText);
           setNoMoreStories(true);
         } else {
           setError(true);
@@ -219,7 +220,6 @@ function CurrentStory({storyPrompt}){
   //the story and its components to be rendered, initially an empty
   //element until the storyPrompt is updated by the user
   const [renderComponent, setRenderComponent] = useState(<></>);
-  
   //prevents from being rendered on the first page load,
   //useEffect will only be called when storyPrompt is updated by the user
   const isFirstRender = useRef(true)
@@ -231,7 +231,7 @@ function CurrentStory({storyPrompt}){
     
     //send prompt to the backend
     const fetchInfo = async () => {
-      const fetchUrl = `http://localhost:53955/makeRequest/${storyPrompt}`;
+      const fetchUrl = BaseUrl.phase2 + `makeRequest/${storyPrompt}`;
       try {
         const response = await fetchData(fetchUrl);
         //check if the response is valid
@@ -240,9 +240,13 @@ function CurrentStory({storyPrompt}){
             const newData = await response.json();
             //pass the new data to the story compoenent
             setRenderComponent(<Story {...newData[0]} />);
-          } else if (response.status === 404) {//no more stories
-            console.error('Not Found:', response.statusText);
-          } 
+          } else if (response.status === 429) {//reached prompts limit for the day
+            //set the request limit tracker to inform the user when to come back
+            //and can prompt again
+            const errorData = await response.json();
+            requestLimitTracker.setTracker(errorData.checkAgainTime, errorData.reason);
+            setRenderComponent(requestLimitTracker.timeComp());
+          }
         } catch (errorReq) {
           console.error('Error fetching data:', errorReq);
         }
@@ -254,6 +258,8 @@ function CurrentStory({storyPrompt}){
   return renderComponent;
 }
 
+
+
 //the component of phase2
 //it displays all the stories (and their stages),
 //handles user input, and fetches more data
@@ -262,9 +268,17 @@ function TabBodyPhase2(){
   //set the story prompt of the data to be retrieved
   const [storyPrompt, setStoryPrompt] = useState("Story");
 
+  let formComp = ''  
+  //check if the user can prompt, this is to prevent the display of the form
+  //so the user do not spam prompts and their requests have already reached daily limit anyways
+  if (requestLimitTracker.hasTimePassed())//display prompt form
+    formComp = <Phase2Form setStoryPrompt={setStoryPrompt} />
+  else//dispaly a message when prompt is possible
+    formComp = requestLimitTracker.timeComp();
+
   return(
     <>
-      <Phase2Form setStoryPrompt={setStoryPrompt}/>
+      {formComp}
       <CurrentStory storyPrompt={storyPrompt}/>
       <h4>One upon a time.....</h4>
       <hr/>
