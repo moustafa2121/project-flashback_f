@@ -11,7 +11,7 @@
 /* the title of the story */
 .storyArticleTitle{
     text-align:left;
-    font-size: 28px; 
+    font-size: 1.5em;
     letter-spacing: -1px; 
     line-height: 25px !important;
     color: white; 
@@ -19,7 +19,14 @@
     margin: 5px auto; 
     padding: 0 10px 5px;
     text-align: center; 
-    line-height: 50px
+    line-height: 50px;
+    
+    max-width: 70%;
+    /* limit the text lines */
+    display: -webkit-box;
+    -webkit-line-clamp: 4;
+    -webkit-box-orient: vertical;
+    overflow-y: scroll;
 }
 
 /* a stage of the story */
@@ -138,15 +145,25 @@
 .displayNone{
     display:none;
 }
-
 #requestLimitMessage{
     font-size: 0.9em;
     max-width: 50vw;
+}
+.spinnerContainer{
+    margin:20vh 0;
+}
+@media only screen and (max-width: 1000px) {
+    .storyArticleTitle{
+        max-width: 100%;
+    }
 }
 
 @media only screen and (max-width: 585px) {
     .storyStage img{
         width: 100%;
         height: auto;
+    }
+    .storyArticleTitle{
+        font-size: 1.1em;
     }
 }

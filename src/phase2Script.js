@@ -22,7 +22,6 @@ function StoryStage(props){
   const fetchInfo = async () => {
     const imgUrl = BaseUrl.phase2 +`getImage/${props.storyId}/${props.stageNumber}`;
     try {
-      console.log("StoryStage rquesting: ", imgUrl);
       const response = await fetchData(imgUrl);
       //check if the response is valid
       if (response.ok) {
@@ -51,7 +50,7 @@ function StoryStage(props){
   const c2 = imgSrc === null ? 'displayNone' : '';
   //set the imgSrc if it has been fetched and available for display, 
   //otherwise, set a default loading img
-  const imgSrcUrl = imgSrc !== null ? imgSrc : 'loadingImg.jpg'
+  const imgSrcUrl = imgSrc !== null ? imgSrc : 'loadingGif.gif'
   return(
     <div className={`storyStage ${cl}`}>
       <h4 className={`storyStageTitle ${c2}`}>
@@ -112,17 +111,25 @@ function Story(props){
   }
 
   return(
-    <article className="storyArticle" id={story.storyId}>
-      <h3 className="storyArticleTitle">
-        {story.storyPrompt}
+    <>
+      <h3 className="storyArticleTitle" title={story.storyPrompt} data-bs-toggle="tooltip" data-bs-placement="top">
+          {story.storyPrompt}
       </h3>
-      <a className="prev" onClick={() => updateSlideIndex(-1)}>&#10094;</a>
-      <a className="next" onClick={() => updateSlideIndex(1)}>&#10095;</a>
-      {storyStages.map(entry => <StoryStage {...entry} storyStageAvailable={storyStageAvailable} updateStageAvailable={updateStageAvailable} storyId={story.storyId} slideIndex={slideIndex} key={entry.stageNumber}/> )}
-      <div className="dotCotnainer">
-        {storyStages.map(dot => <Dot {...dot} storyStageAvailable={storyStageAvailable} slideIndex={slideIndex} setSlideIndex={setSlideIndex} key={dot.stageNumber}/>)}
-      </div>
-    </article>
+      <article className="storyArticle" id={story.storyId}>
+        <a className="prev" onClick={() => updateSlideIndex(-1)}>&#10094;</a>
+        <a className="next" onClick={() => updateSlideIndex(1)}>&#10095;</a>
+        {storyStages.map(entry => <StoryStage {...entry} storyStageAvailable={storyStageAvailable} updateStageAvailable={updateStageAvailable} storyId={story.storyId} slideIndex={slideIndex} key={entry.stageNumber}/> )}
+        <div className="dotCotnainer">
+          {storyStages.map(dot => <Dot {...dot} storyStageAvailable={storyStageAvailable} slideIndex={slideIndex} setSlideIndex={setSlideIndex} key={dot.stageNumber}/>)}
+        </div>
+      </article>
+    </>
+  )
+}
+
+function Tooltip({value}){
+  return(
+      <span classclassName="tooltiptext">value</span>
   )
 }
 
@@ -216,7 +223,7 @@ function OldStories(){
 }
 
 //displays the story as prompted by the user
-function CurrentStory({storyPrompt}){
+function CurrentStory({storyPrompt, setLoadingSpinner, setFormComponent}){
   //the story and its components to be rendered, initially an empty
   //element until the storyPrompt is updated by the user
   const [renderComponent, setRenderComponent] = useState(<></>);
@@ -233,6 +240,7 @@ function CurrentStory({storyPrompt}){
     const fetchInfo = async () => {
       const fetchUrl = BaseUrl.phase2 + `makeRequest/${storyPrompt}`;
       try {
+        setLoadingSpinner(true);
         const response = await fetchData(fetchUrl);
         //check if the response is valid
         if (response.ok) {
@@ -245,10 +253,15 @@ function CurrentStory({storyPrompt}){
             //and can prompt again
             const errorData = await response.json();
             requestLimitTracker.setTracker(errorData.checkAgainTime, errorData.reason);
-            setRenderComponent(requestLimitTracker.timeComp());
+            //set the display for the request limit tracker
+            setFormComponent(requestLimitTracker.timeComp());
+          } else if (response.status === 422){//something went wrong
+            setRenderComponent(<h4>Request failed :(</h4>);
           }
         } catch (errorReq) {
           console.error('Error fetching data:', errorReq);
+        } finally{
+          setLoadingSpinner(false);
         }
     }
     
@@ -258,30 +271,35 @@ function CurrentStory({storyPrompt}){
   return renderComponent;
 }
 
-
-
 //the component of phase2
 //it displays all the stories (and their stages),
 //handles user input, and fetches more data
 //when the user scrolls
 function TabBodyPhase2(){
-  //set the story prompt of the data to be retrieved
+  //story prompt of the data to be retrieved
   const [storyPrompt, setStoryPrompt] = useState("Story");
 
-  let formComp = ''  
   //check if the user can prompt, this is to prevent the display of the form
-  //so the user do not spam prompts and their requests have already reached daily limit anyways
-  if (requestLimitTracker.hasTimePassed())//display prompt form
-    formComp = <Phase2Form setStoryPrompt={setStoryPrompt} />
-  else//dispaly a message when prompt is possible
-    formComp = requestLimitTracker.timeComp();
+  //so the user do not spam prompts and their requests count have already reached daily limit anyways
+  const [formComponent, setFormComponent] = useState(requestLimitTracker.hasTimePassed() ? <Phase2Form setStoryPrompt={setStoryPrompt} /> : requestLimitTracker.timeComp());
+
+  //displays a spinner when prompting, removed when the story has been fetched
+  const [loadingSpinner, setLoadingSpinner] = useState(false);
 
   return(
     <>
-      {formComp}
-      <CurrentStory storyPrompt={storyPrompt}/>
+      {formComponent}
       <h4>One upon a time.....</h4>
       <hr/>
+      <CurrentStory storyPrompt={storyPrompt} setLoadingSpinner={setLoadingSpinner} setFormComponent={setFormComponent}/>
+      {loadingSpinner &&
+        <>
+          <h4>Do not refresh the page</h4>
+          <div className="spinner-border spinnerContainer">
+            <span className="visually-hidden">Loading...</span>
+          </div>
+        </>
+      }
       <OldStories key={'stories'}/>
     </>
   )
