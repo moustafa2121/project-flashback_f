@@ -124,6 +124,7 @@ function TabBodyPhase1(){
   const [batch, setbatch] = useState(1);
   //to display error message, if any
   const [error, setError] = useState(false);
+  const [tooManyRequests, setTooManyRequests] = useState(false);
   //if the server does not return anymore stories, this variable will stop further requests
   const [noMoreEntries, setNoMoreEntries] = useState(false);
 
@@ -153,6 +154,8 @@ function TabBodyPhase1(){
         setbatch(prevBatch => prevBatch + 1);
       } else if (response.status === 404) {//no more entries
         setNoMoreEntries(true);
+      } else if (response.status === 429) {//too many requests
+        setTooManyRequests(true);
       } else {
         setError(true);
       }
@@ -196,7 +199,9 @@ function TabBodyPhase1(){
   }, [batch, fetchingData]);
   
   //if the data are not loaded/being loaded
-  if (error)
+  if (tooManyRequests)
+      return <h4>Too many requests....</h4>;
+  else if (error)
       return <h4>Failed to get data :(</h4>;
   else if (data.length === 0)
     return <h4>Loading...</h4>; //todo: loading icon
