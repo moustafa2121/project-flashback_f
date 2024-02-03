@@ -5,7 +5,7 @@ import React from 'react';
 //base url for each phase
 const BaseUrl = (() => {
     return {
-        phase1: 'http://localhost:54599/',
+        phase1: 'http://localhost/api/',
         phase2: 'http://localhost:60846/',
     }
 })();
