@@ -8,6 +8,8 @@ WORKDIR /react
 COPY . .
 
 # Install dependencies
+RUN npm set progress=false
+RUN npm config set registry http://registry.npmjs.org/
 RUN npm install
 
 # Build the application
