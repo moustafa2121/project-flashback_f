@@ -37,7 +37,7 @@ function TabHead(props){
 //that provides unique features different from other tabs/phases
 function Tabs(){
   //which tab is active
-  const [activeTab, setActiveTab] = useState(1);
+  const [activeTab, setActiveTab] = useState(2);
 
   //data specifying each tab
   const tabsInfo = [

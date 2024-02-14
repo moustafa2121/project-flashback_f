@@ -1,70 +1,64 @@
-# Getting Started with Create React App
+# FlashBack
+[Live app](http://35.222.8.176/)
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## About 🛈
+Project FlashBack “simulates” a period of time. It is made of several phases, currently Phase1 and Phase2 are live.
 
-## Available Scripts
+Live Demo is deployed on Ubuntu VM on Google Cloud
 
-In the project directory, you can run:
+### Phase1
+[Throwback](https://github.com/moustafa2121/ProjectFlashback_b): Inspired by the question of “what the internet was like back then?”. It fetches data from several sources, trying to give a feel what was it like browsing the internet in a given year. Data scraped from several sources, providing posts from Reddit, Twitter, Spotify, IMDB, Wikipedia, KnowYourMeme.
 
-### `npm start`
+User can input the year, posts are fetched as the user scrolls (infinite scroll).
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+### Phase2
+[Lens Into The Past](https://github.com/moustafa2121/ProjectFlashback_b_p2): It uses OpenAI’s ChatGPT API and Dall-E API to simulate events in the distant past. The user submits a query (ex: William The Conqueror Invading Britain), and that query will be submitted to ChatGPT API. The latter will return 5 paragraphs, describing different stages of the historical story regarding the given query.\
+Afterwards, Dall-E will be promoted for 5 images regarding each different stories. Query results will be returned, saved in the DB, and sent to the user in real-time.
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+Furthermore, the user can scroll down to view other stories (including those of other users).
 
-### `npm test`
+User is limited to 3 queries per day. All users have a combined limit of 10 queries per day.
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+🚩Try avoiding controversial subjects as that will be blocked by OpenAI’s policy of the whatever. Anything that may involve gory scenarios or sensitive subjects will be rejected by ChatGPT or Dall-E’s API (in which the latter seems to be more strict). 🚩
 
-### `npm run build`
+## Built with 🔧
+- Django REST Framework
+- React
+- Bootstrap
+- Nginx
+- Gunicorn
+- Docker
+- Google Cloud
+- OpenAI/ChatGPT/Dall-E
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## Features 📋
+- SPA
+-	Responsive display
+-	Infinite scroll
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
 
-### `npm run eject`
+## Usage 🧮
+There are 4 repositories that make up the entire project. Nginx, backend1, backend2 (each run on a Docker container), and React's frontend. To run, do the following:\
+1- Clone them and place them in the following structure:\
+├── [main repo container docker-compose](https://github.com/moustafa2121/flashback-docker/tree/main)\
+│   ├── [Phase1 backend](https://github.com/moustafa2121/ProjectFlashback_b)\
+│   ├── [Phase2 backend](https://github.com/moustafa2121/ProjectFlashback_b_p2)\
+│   ├── [React Frontend](https://github.com/moustafa2121/project-flashback_f)
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+2- Install docker and docker-compose\
+3- In the React project, change the IP address of the backend API called on by the frontend (found in the frontend repo -> src/helper.js), which is expected to be that of the machine you're building on the code.\
+4- Then, while in the main repo, run
+```sh
+sudo docker-compose up --build
+```
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+Note that even though phase2 will retrieve the previous stories, it will fail in making queries. This is because you need your own OpenAI API key (the one for live demo is hidden, obviously). You can add your own in the Docker file of the backend2 repo.
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+## Architecture
+![architecture](https://github.com/moustafa2121/flashback-docker/blob/main/Architecture.jpg)
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+## Demo ⏵
+🚩Note that some frames were trimmed from the demo gif to shorten the phase2 prompting because it takes a while. Takes around 30 seconds for ChatGPT to return a query, and maybe 10-15 seconds for the each image (they are queried concurrently though). 🚩
 
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+![demo](https://github.com/moustafa2121/flashback-docker/blob/main/demo.gif)
